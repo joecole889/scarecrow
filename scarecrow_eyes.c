@@ -40,6 +40,7 @@ static void media_configure(GstRTSPMediaFactory *factory, GstRTSPMedia *media, g
   GstElement *element, *appsink;
   GstAppSinkCallbacks ascbs = {NULL, NULL, scarecrow_target_update};
   element = gst_rtsp_media_get_element(media);
+  /* GST_DEBUG_BIN_TO_DOT_FILE(GST_BIN(element),GST_DEBUG_GRAPH_SHOW_CAPS_DETAILS,"/home/joe/sd/code/scarecrow/gstreamer_graphs/scarecrow.dot"); */
   appsink = gst_bin_get_by_name_recurse_up(GST_BIN(element), "targetconnect");
   gst_app_sink_set_callbacks(GST_APP_SINK(appsink), &ascbs, target, NULL);
   gst_object_unref(appsink);
