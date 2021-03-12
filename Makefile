@@ -20,22 +20,20 @@
 # DEALINGS IN THE SOFTWARE.
 ################################################################################
 
-APP:= scarecrow_eyes
+APP:= scarecrow
+GSTPLUGIN:= libgstzedsplit.so
 
 TARGET_DEVICE = $(shell gcc -dumpmachine | cut -f1 -d -)
 
 NVDS_VERSION:=5.0
 
 LIB_INSTALL_DIR?=/opt/nvidia/deepstream/deepstream-$(NVDS_VERSION)/lib/
-APP_INSTALL_DIR?=/opt/nvidia/deepstream/deepstream-$(NVDS_VERSION)/bin/
+GST_INSTALL_DIR?=/usr/local/lib/aarch64-linux-gnu/gstreamer-1.0/
+APP_INSTALL_DIR?=.
 
 ifeq ($(TARGET_DEVICE),aarch64)
   CFLAGS:= -DPLATFORM_TEGRA
 endif
-
-SRCS:= $(wildcard *.c)
-
-INCS:= $(wildcard *.h)
 
 PKGS:= gstreamer-1.0 gstreamer-app-1.0 gstreamer-rtsp-1.0 gstreamer-rtsp-server-1.0
 
@@ -44,7 +42,6 @@ OBJS:= $(SRCS:.c=.o)
 OBJS+= Robot.o StateMachine.o
 
 CFLAGS+= -ggdb -fPIC -I/opt/nvidia/deepstream/deepstream-5.0/sources/includes
-CFLAGS+= -I/home/joe/sd/code/gst-template/gst-plugin/src
 CFLAGS+= -I/home/joe/sd/code/DynamixelSDK/c++/include/dynamixel_sdk
 CFLAGS+= `pkg-config --cflags $(PKGS)`
 
@@ -54,10 +51,28 @@ LIBS+= -lm -lnvdsgst_meta -lnvds_meta -lnvdsgst_dsexample
 LIBS+= -L/usr/local/lib/ -ldxl_arch64_cpp
 LIBS+= -Wl,-rpath,$(LIB_INSTALL_DIR)
 
-all: $(APP)
+GSTSRCS:= gstzedsplit.c metadepth.c
+GSTINCS:= $(GSTSRCS:.c=.h)
+GSTOBJS:= $(GSTSRCS:.c=.o)
+GSTCFLAGS:= -ggdb -fPIC -I/home/joe/sd/code/gst-template/gst-plugin/src
+GSTCFLAGS+= -I/opt/nvidia/deepstream/deepstream-5.0/sources/includes
+GSTCFLAGS+= `pkg-config --cflags gstreamer-1.0`
+GSTLIBS:= -shared -L$(LIB_INSTALL_DIR)
+GSTLIBS+= -lnvdsgst_meta -lnvds_meta
 
-%.o: %.c $(INCS) Makefile
-	$(CC) -c -o $@ $(CFLAGS) $<
+all: $(APP) $(GSTPLUGIN)
+.PHONY: all gst
+
+gst: $(GSTPLUGIN)
+
+gstzedsplit.o: gstzedsplit.c $(GSTINCS) Makefile
+	$(CC) -c -o $@ $(GSTCFLAGS) $<
+
+metadepth.o: metadepth.c metadepth.h Makefile
+	$(CC) -c -o $@ $(GSTCFLAGS) $<
+
+$(GSTPLUGIN): $(GSTOBJS) Makefile
+	$(CC) -o $@ $(GSTOBJS) $(GSTLIBS)
 
 %.o: %.cpp $(INCS) Makefile
 	$(CXX) -c -o $@ $(CFLAGS) $<
@@ -65,8 +80,10 @@ all: $(APP)
 $(APP): $(OBJS) Makefile
 	$(CXX) -o $(APP) $(OBJS) $(LIBS)
 
-install: $(APP)
-	cp -rv $(APP) $(APP_INSTALL_DIR)
+install: $(GSTPLUGIN) #$(APP)
+	sudo chmod -x $(GSTPLUGIN)
+	sudo cp $(GSTPLUGIN) $(GST_INSTALL_DIR)
+	#cp -rv $(APP) $(APP_INSTALL_DIR)
 
 clean:
-	rm -rf $(OBJS) $(APP)
+	rm -rf $(OBJS) $(APP) $(GSTPLUGIN)
