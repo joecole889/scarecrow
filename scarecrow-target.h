@@ -40,7 +40,7 @@ const guint   scarecrow_target_get_frame_height(ScarecrowTarget *self);
 void          scarecrow_target_set_frame_height(ScarecrowTarget *self, const guint frame_height);
 
 GstFlowReturn scarecrow_target_update(GstAppSink*,gpointer);
-void scarecrow_target_get_location(ScarecrowTarget*,guint*,guint*,guint*);
+void scarecrow_target_get_location(ScarecrowTarget*,unsigned char*,unsigned char*,unsigned short int*);
 int timespec_subtract (struct timespec*, struct timespec*, struct timespec*);
 guint64 timespec_int (struct timespec*);
 

@@ -41,26 +41,32 @@ PKGS:= gstreamer-1.0 gstreamer-app-1.0 gstreamer-rtsp-1.0 gstreamer-rtsp-server-
 
 OBJS:= $(SRCS:.c=.o)
 
-CFLAGS+= -ggdb -I/opt/nvidia/deepstream/deepstream-5.0/sources/includes -I/home/joe/sd/code/gst-template/gst-plugin/src
+OBJS+= Robot.o StateMachine.o
 
+CFLAGS+= -ggdb -fPIC -I/opt/nvidia/deepstream/deepstream-5.0/sources/includes
+CFLAGS+= -I/home/joe/sd/code/gst-template/gst-plugin/src
+CFLAGS+= -I/home/joe/sd/code/DynamixelSDK/c++/include/dynamixel_sdk
 CFLAGS+= `pkg-config --cflags $(PKGS)`
 
 LIBS:= `pkg-config --libs $(PKGS)`
-
-LIBS+= -L$(LIB_INSTALL_DIR) -L$(LIB_INSTALL_DIR)/gst-plugins/ -lm -lnvdsgst_meta -lnvds_meta -lnvdsgst_dsexample -Wl,-rpath,$(LIB_INSTALL_DIR)
+LIBS+= -L$(LIB_INSTALL_DIR) -L$(LIB_INSTALL_DIR)/gst-plugins/
+LIBS+= -lm -lnvdsgst_meta -lnvds_meta -lnvdsgst_dsexample
+LIBS+= -L/usr/local/lib/ -ldxl_arch64_cpp
+LIBS+= -Wl,-rpath,$(LIB_INSTALL_DIR)
 
 all: $(APP)
 
 %.o: %.c $(INCS) Makefile
 	$(CC) -c -o $@ $(CFLAGS) $<
 
+%.o: %.cpp $(INCS) Makefile
+	$(CXX) -c -o $@ $(CFLAGS) $<
+
 $(APP): $(OBJS) Makefile
-	$(CC) -o $(APP) $(OBJS) $(LIBS)
+	$(CXX) -o $(APP) $(OBJS) $(LIBS)
 
 install: $(APP)
 	cp -rv $(APP) $(APP_INSTALL_DIR)
 
 clean:
 	rm -rf $(OBJS) $(APP)
-
-

@@ -89,7 +89,7 @@ scarecrow_create_element (GstRTSPMediaFactory * factory, const GstRTSPUrl * url)
                "batched-push-timeout", 120000, NULL);
   g_object_set(G_OBJECT(inference),
                "batch-size", 5,
-               "config-file-path", "/home/joe/sd/code/scarecrow_eyes/zed_peoplenet.txt", NULL);
+               "config-file-path", "/home/joe/sd/code/scarecrow/zed_peoplenet.txt", NULL);
   g_object_set(G_OBJECT(tracker),
                "tracker-width", 1280,
                "tracker-height", 720,

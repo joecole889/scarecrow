@@ -402,11 +402,13 @@ GstFlowReturn scarecrow_target_update(GstAppSink *appsink, gpointer self_ptr) {
   return GST_FLOW_OK;
 }
 
-void scarecrow_target_get_location(ScarecrowTarget *self, guint *x, guint *y, guint *depth) {
+void scarecrow_target_get_location(ScarecrowTarget *self, unsigned char *x, unsigned char *y, unsigned short int *depth) {
   pthread_mutex_lock(&(self->lock));
-  *x = self->x;
-  *y = self->y;
-  *depth = self->depth;
+  x[0] = (unsigned char)(self->x & 0xff);
+  x[1] = (unsigned char)((self->x >> 8) & 0xff);
+  y[0] = (unsigned char)(self->y & 0xff);
+  y[1] = (unsigned char)((self->y >> 8) & 0xff);
+  *depth = (unsigned short int)self->depth;
   pthread_mutex_unlock(&(self->lock));
 }
 

@@ -22,8 +22,8 @@
 
 [property]
 net-scale-factor=0.0039215697906911373
-labelfile-path=/home/joe/sd/code/scarecrow_eyes/labels_peoplenet.txt
-model-engine-file=/home/joe/sd/code/scarecrow_eyes/resnet18_peoplenet_pruned_fp16.engine
+labelfile-path=/home/joe/sd/code/scarecrow/labels_peoplenet.txt
+model-engine-file=/home/joe/sd/code/scarecrow/resnet18_peoplenet_pruned_fp16.engine
 infer-dims=3;544;960
 uff-input-blob-name=input_1
 batch-size=5
